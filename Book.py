@@ -10,6 +10,11 @@ class Book(Display):
         self._author = author
         self._genres = []
 
+    @staticmethod
+    def validate_isbn(isbn: str) -> bool:
+        clean = isbn.replace("-", "")
+        return clean.isdigit() and len(clean) in (10, 13)
+
     @property
     def price(self):
         return self._price
