@@ -10,7 +10,6 @@ class Client(Display):
         self._email = email
         self._address = address
 
-    # Властивості, потрібні для Order
     @property
     def id_client(self):
         return self._id_client
