@@ -1,25 +1,19 @@
-from Client import Client
-from Payment import Payment
-from Shipping import Shipping
-from Display import Display
 from datetime import date
+from Display import Display
 
 
-class Order(Client, Shipping, Payment, Display):
-    def __init__(self, id_order, client: Client, payment: Payment, shipping: Shipping, order_date=None):
+class Order(Display):
+    def __init__(self, id_order, client, payment, shipping, order_date=None):
         self._id_order = id_order
-        self.order_date = order_date if order_date else date.today()
+        self._client = client
+        self._payment = payment
+        self._shipping = shipping
+        self._order_date = order_date if order_date else date.today()
         self._items = []
         self._total_pay = 0.0
 
-        Client.__init__(self, client.id_client, client.first_name, client.last_name,
-                        client.phone, client.email, client.address)
-        Payment.__init__(self, payment.id_payment, payment.method_payment)
-        Shipping.__init__(self, shipping.id_shipping,
-                          shipping.method_shipping, shipping.cost)
-
     def _calculate_cost(self):
-        return sum(book.price * quantity for book, quantity in self._items) + self.cost
+        return sum(book.price * quantity for book, quantity in self._items) + self._shipping.cost
 
     def add_book(self, book, quantity):
         self._items.append((book, quantity))
@@ -33,7 +27,22 @@ class Order(Client, Shipping, Payment, Display):
     def items(self):
         return self._items
 
+    @property
+    def client(self):
+        return self._client
+
+    @property
+    def payment(self):
+        return self._payment
+
+    @property
+    def shipping(self):
+        return self._shipping
+
     def display_info(self):
-        return (f"Замовлення №{self._id_order}: {self.first_name} {self.last_name} | "
-                f"Сума (з доставкою): {self.total_pay} грн | "
-                f"Доставка: {self.method_shipping} ({self.cost} грн) | Оплата: {self.method_payment}")
+        return (
+            f"Замовлення №{self._id_order}: {self._client.first_name} {self._client.last_name} | "
+            f"Сума (з доставкою): {self.total_pay} грн | "
+            f"Доставка: {self._shipping.method_shipping} ({self._shipping.cost} грн) | "
+            f"Оплата: {self._payment.method_payment}"
+        )
